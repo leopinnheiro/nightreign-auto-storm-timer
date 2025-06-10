@@ -1,0 +1,11 @@
+# Keyboard Shortcuts
+
+| Command     | Description                              |
+|-------------|------------------------------------------|
+| Ctrl + Q    | Close the application                    |
+| F1          | Start, pause, and advance the phase      |
+| F2          | Reset the remaining time                 |
+| F3          | Go to the previous phase                 |
+| F4          | Go to the next phase                     |
+| F5          | Toggle compact mode                      |
+| F6          | Show/hide the help window                |

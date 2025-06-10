@@ -1,0 +1,56 @@
+﻿<Window x:Class="nightreign_auto_storm_timer.Views.HelpWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:nightreign_auto_storm_timer"
+        d:DataContext="{d:DesignInstance Type=local:ViewModels.HelpViewModel}"
+        mc:Ignorable="d"
+        Title="Nightreign Auto Storm Timer - Help"
+        SizeToContent="WidthAndHeight"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Focusable="True"
+>
+    <Border Background="#01000000" CornerRadius="0" BorderThickness="1">
+        <StackPanel Orientation="Vertical">
+            <TextBlock Text="Instructions"  FontSize="15" Foreground="#a1a1aa"/>
+            <StackPanel Orientation="Vertical" Margin="10 0">
+                <ItemsControl ItemsSource="{Binding HelpList}" FontSize="14">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <Grid Margin="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="55"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Command}" 
+                                               FontWeight="Bold" 
+                                               Foreground="#fafafa"
+                                               Grid.Column="0"/>
+
+                                    <TextBlock Text="-"
+                                               Margin="4 0"
+                                               Foreground="#a1a1aa"
+                                               Grid.Column="1"
+                                               HorizontalAlignment="Center"/>
+
+                                    <TextBlock Text="{Binding Description}" 
+                                               Foreground="#fafafa"
+                                               Grid.Column="2"/>
+                                </Grid>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+
+</Window>
