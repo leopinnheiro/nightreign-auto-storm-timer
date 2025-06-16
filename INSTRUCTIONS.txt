@@ -1,3 +1,5 @@
+# Open nast.exe to start App
+
 # Keyboard Shortcuts
 
 | Command     | Description                              |
@@ -8,6 +10,6 @@
 | F3          | Go to the previous phase                 |
 | F4          | Go to the next phase                     |
 | F5          | Toggle compact mode                      |
-| F6          | Toggle automatic mode			         |
+| F6          | Toggle automatic mode                    |
 | F7          | Show/hide the help window                |
 | F8          | Show/hide the configuration window       |
