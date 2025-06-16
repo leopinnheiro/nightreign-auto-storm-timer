@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 
 namespace nightreign_auto_storm_timer.Utils
@@ -7,7 +6,8 @@ namespace nightreign_auto_storm_timer.Utils
     public enum Asset
     {
         StartWav,
-        StopWav
+        StopWav,
+        AgmenaTrainedData
     }
 
     public static class AssetLoader
@@ -29,6 +29,7 @@ namespace nightreign_auto_storm_timer.Utils
             {
                 Asset.StartWav => "start.wav",
                 Asset.StopWav => "stop.wav",
+                Asset.AgmenaTrainedData => "tessdata.agmena.traineddata",
                 _ => throw new ArgumentOutOfRangeException(nameof(asset), asset, "Asset desconhecido")
             };
 

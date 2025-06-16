@@ -1,5 +1,9 @@
 ﻿using Gma.System.MouseKeyHook;
+using nightreign_auto_storm_timer.Models;
+using nightreign_auto_storm_timer.Utils;
 using nightreign_auto_storm_timer.ViewModels;
+using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
 
@@ -12,29 +16,30 @@ public partial class MainWindow : Window
 {
     private IKeyboardMouseEvents? _globalHook;
     private HelpWindow? _helpWindow;
+    private ConfigWindow? _configWindow;
 
     public MainWindow()
     {
+        AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+        {
+            File.WriteAllText("crash.log", e.ExceptionObject.ToString());
+        };
+
+        AppPaths.EnsureDirectoriesExist();
+
         InitializeComponent();
         DataContext = new MainViewModel();
 
         Loaded += MainWindow_Loaded;
         Closed += MainWindow_Closed;
+
+        UpdateModeUI();
     }
 
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
         _globalHook = Hook.GlobalEvents();
         _globalHook.KeyDown += GlobalHook_KeyDown;
-    }
-
-    private void MainWindow_Closed(object? sender, EventArgs e)
-    {
-        if (_globalHook is not null)
-        {
-            _globalHook.KeyDown -= GlobalHook_KeyDown;
-            _globalHook.Dispose();
-        }
     }
 
     private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -83,14 +88,14 @@ public partial class MainWindow : Window
             vm.ToggleCompactMode();
             Dispatcher.Invoke(UpdateModeUI);
         }
-        if (e.KeyCode == System.Windows.Forms.Keys.F6)
+        // Toggle help view
+        else if (e.KeyCode == System.Windows.Forms.Keys.F6)
         {
             if (_helpWindow == null)
             {
                 _helpWindow = new HelpWindow();
                 _helpWindow.Owner = this;
 
-                // Exibir à direita da janela principal
                 var main = this;
                 _helpWindow.Left = main.Left + main.Width + 10;
                 _helpWindow.Top = main.Top;
@@ -104,6 +109,29 @@ public partial class MainWindow : Window
             else
             {
                 _helpWindow.Show();
+            }
+        }
+        // Start/ Stop processor
+        else if (e.KeyCode == System.Windows.Forms.Keys.F7)
+        {
+            vm.ToggleUsingProcessor();
+        }
+        // Toggle Config view
+        else if (e.KeyCode == System.Windows.Forms.Keys.F8)
+        {
+            if (_configWindow == null)
+            {
+                _configWindow = new ConfigWindow();
+                _configWindow.Owner = this;
+                _configWindow.Show();
+            }
+            else if (_configWindow.IsVisible)
+            {
+                _configWindow.Hide();
+            }
+            else
+            {
+                _configWindow.Show();
             }
         }
     }
@@ -120,6 +148,18 @@ public partial class MainWindow : Window
         {
             PhasePanel.Visibility = Visibility.Visible;
         }
+    }
+
+    private void MainWindow_Closed(object? sender, EventArgs e)
+    {
+        if (_globalHook is not null)
+        {
+            _globalHook.KeyDown -= GlobalHook_KeyDown;
+            _globalHook.Dispose();
+        }
+
+        if (DataContext is MainViewModel vm)
+            vm.Close();
     }
 }
 

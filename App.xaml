@@ -11,10 +11,10 @@
         <converters:RemainingTimeColorConverter x:Key="RemainingTimeColorConverter"/>
         
         <Style TargetType="Control">
-            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontFamily" Value="Segoe UI Emoji"/>
         </Style>
         <Style TargetType="TextBlock">
-            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontFamily" Value="Segoe UI Emoji"/>
         </Style>
     </Application.Resources>
 </Application>

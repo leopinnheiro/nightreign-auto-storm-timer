@@ -3,14 +3,22 @@ using nightreign_auto_storm_timer.Models;
 using nightreign_auto_storm_timer.Utils;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Windows.Forms;
 using System.Windows.Threading;
 
 namespace nightreign_auto_storm_timer.ViewModels
 {
+    public enum State
+    {
+        Waiting_DayOne,
+        Timer,
+        Waiting_DayTwo
+    }
+
     public partial class MainViewModel : ObservableObject
     {
         [ObservableProperty]
-        private bool isCompactMode;
+        private bool isCompactMode = true;
 
         public ObservableCollection<Phase> PhaseList { get; } = [];
 
@@ -27,20 +35,34 @@ namespace nightreign_auto_storm_timer.ViewModels
         public string CurrentRemainingTimeFormatted =>
             TimeSpan.FromSeconds(CurrentRemainingTime).ToString(@"mm\:ss");
 
+        private Phase dayOnePhase;
+        private Phase dayTwoPhase;
+
+        [ObservableProperty]
+        private State state = State.Waiting_DayOne;
+
+        [ObservableProperty]
+        private bool isUsingProcessor;
+
+        private ScreenOcrProcessor _processor;
+
         public MainViewModel()
         {
-            PhaseList.Add(new Phase { Name = "Day 1 Storm", TimeInSeconds = 270 });
-            PhaseList.Add(new Phase { Name = "Day 1 Storm Shrinking", TimeInSeconds = 180 });
-            PhaseList.Add(new Phase { Name = "Day 1 Storm 2", TimeInSeconds = 210 });
-            PhaseList.Add(new Phase { Name = "Day 1 Storm 2 Shrinking", TimeInSeconds = 180 });
-            PhaseList.Add(new Phase { Name = "Boss Fight", TimeInSeconds = 0 });
-            PhaseList.Add(new Phase { Name = "Day 2 Storm", TimeInSeconds = 270 });
-            PhaseList.Add(new Phase { Name = "Day 2 Storm Shrinking", TimeInSeconds = 180 });
-            PhaseList.Add(new Phase { Name = "Day 2 Storm 2", TimeInSeconds = 210 });
-            PhaseList.Add(new Phase { Name = "Day 2 Storm 2 Shrinking", TimeInSeconds = 180 });
-            PhaseList.Add(new Phase { Name = "Final Boss", TimeInSeconds = 0 });
+            State = State.Waiting_DayOne;
 
-            MockPhasesOnlyInDebug();
+            dayOnePhase = new Phase { Name = "Day 1 Storm", TimeInSeconds = 265 };
+            dayTwoPhase = new Phase { Name = "Day 2 Storm", TimeInSeconds = 265 };
+
+            PhaseList.Add(dayOnePhase);
+            PhaseList.Add(new Phase { Name = "Day 1 Storm Shrinking", TimeInSeconds = 174 });
+            PhaseList.Add(new Phase { Name = "Day 1 Storm 2", TimeInSeconds = 206 });
+            PhaseList.Add(new Phase { Name = "Day 1 Storm 2 Shrinking", TimeInSeconds = 174 });
+            PhaseList.Add(new Phase { Name = "Boss Fight", TimeInSeconds = 0, State = State.Waiting_DayTwo });
+            PhaseList.Add(dayTwoPhase);
+            PhaseList.Add(new Phase { Name = "Day 2 Storm Shrinking", TimeInSeconds = 177 });
+            PhaseList.Add(new Phase { Name = "Day 2 Storm 2", TimeInSeconds = 206 });
+            PhaseList.Add(new Phase { Name = "Day 2 Storm 2 Shrinking", TimeInSeconds = 177 });
+            PhaseList.Add(new Phase { Name = "Final Boss", TimeInSeconds = 0, State = State.Waiting_DayOne });
 
             ActivePhase = PhaseList[0];
 
@@ -51,6 +73,21 @@ namespace nightreign_auto_storm_timer.ViewModels
                 Interval = TimeSpan.FromSeconds(1)
             };
             _timer.Tick += Timer_Tick;
+
+            List<TextStateDetector> detectors =
+            [
+                new(["DIA I", "DAY I", "TAG I", "GIORNO I", "JOUR I"],
+                    DayOneDetected),
+                new(["DIA II", "DAY II", "TAG II", "GIORNO II", "JOUR II"],
+                    DayTwoDetected)
+            ];
+
+            _processor = new ScreenOcrProcessor(stateDetectors: detectors);
+
+            IsUsingProcessor = true;
+
+            int monitorCount = Screen.AllScreens.Length;
+            Debug.WriteLine($"O usuário tem {monitorCount} monitor(es) conectado(s).");
         }
 
         public void ResetTimer()
@@ -67,6 +104,9 @@ namespace nightreign_auto_storm_timer.ViewModels
             {
                 newValue.IsActive = true;
                 CurrentRemainingTime = newValue.TimeInSeconds;
+                
+                if (newValue.State != null)
+                    State = (State)newValue.State;
             }
 
             OnPropertyChanged(nameof(ActivePhaseName));
@@ -75,6 +115,19 @@ namespace nightreign_auto_storm_timer.ViewModels
         partial void OnCurrentRemainingTimeChanged(int oldValue, int newValue)
         {
             OnPropertyChanged(nameof(CurrentRemainingTimeFormatted));
+        }
+
+        partial void OnStateChanged(State value)
+        {
+            Debug.WriteLine($"Current State: {value.ToString()}");
+        }
+
+        partial void OnIsUsingProcessorChanged(bool value)
+        {
+            if (value)
+                _processor.Start();
+            else
+                _processor.Stop();
         }
 
         private void Timer_Tick(object? sender, EventArgs e)
@@ -129,6 +182,7 @@ namespace nightreign_auto_storm_timer.ViewModels
                 else
                 {
                     _timer.Start();
+                    State = State.Timer;
                 }
             }
         }
@@ -160,20 +214,45 @@ namespace nightreign_auto_storm_timer.ViewModels
             }
         }
 
-        [Conditional("DEBUG")]
-        public void MockPhasesOnlyInDebug()
+        public void ToggleUsingProcessor()
         {
-            PhaseList.Clear();
-            PhaseList.Add(new Phase { Name = "Day 1 Storm", TimeInSeconds = 5 });
-            PhaseList.Add(new Phase { Name = "Day 1 Storm Shrinking", TimeInSeconds = 5 });
-            PhaseList.Add(new Phase { Name = "Day 1 Storm 2", TimeInSeconds = 5 });
-            PhaseList.Add(new Phase { Name = "Day 1 Storm 2 Shrinking", TimeInSeconds = 5 });
-            PhaseList.Add(new Phase { Name = "Boss Fight", TimeInSeconds = 0 });
-            PhaseList.Add(new Phase { Name = "Day 2 Storm", TimeInSeconds = 5 });
-            PhaseList.Add(new Phase { Name = "Day 2 Storm Shrinking", TimeInSeconds = 5 });
-            PhaseList.Add(new Phase { Name = "Day 2 Storm 2", TimeInSeconds = 5 });
-            PhaseList.Add(new Phase { Name = "Day 2 Storm 2 Shrinking", TimeInSeconds = 5 });
-            PhaseList.Add(new Phase { Name = "Final Boss", TimeInSeconds = 0 });
+            IsUsingProcessor = !IsUsingProcessor;
+        }
+
+        public void SetDayOnePhase()
+        {
+            if (State == State.Waiting_DayOne)
+            {
+                ActivePhase = dayOnePhase;
+                ToggleTimer();
+            }
+        }
+
+        public void SetDayTwoPhase()
+        {
+            if (State == State.Waiting_DayTwo)
+            {
+                ActivePhase = dayTwoPhase;
+                ToggleTimer();
+            }
+        }
+
+        private void DayOneDetected(string text)
+        {
+            Debug.WriteLine("Day I Detected");
+            SetDayOnePhase();
+        }
+
+        private void DayTwoDetected(string text)
+        {
+            Debug.WriteLine("Day II Detected");
+            SetDayTwoPhase();
+        }
+
+        public void Close()
+        {
+            _processor?.Stop();
+            _processor?.Dispose();
         }
     }
 }

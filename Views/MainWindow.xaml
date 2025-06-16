@@ -4,10 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:nightreign_auto_storm_timer"
-        d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
+        xmlns:vm="clr-namespace:nightreign_auto_storm_timer.ViewModels"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
         mc:Ignorable="d"
         Title="Nightreign Auto Storm Timer"
-        Width="310"
+        Width="220"
         SizeToContent="Height"
         WindowStyle="None"
         AllowsTransparency="True"
@@ -19,14 +20,13 @@
         Focusable="True"
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
 >
-    <Border Background="#01000000" CornerRadius="0" BorderThickness="1">
+    <Grid Background="#01000000">
         <StackPanel Orientation="Vertical">
-
             <!-- Timer -->
             <StackPanel Orientation="Vertical">
                 <TextBlock Text="{Binding ActivePhaseName}"
                            FontSize="16"
-                           Foreground="#a1a1aa"
+                           Foreground="#d4d4d8"
                            HorizontalAlignment="Center"/>
                 <TextBlock Text="{Binding CurrentRemainingTimeFormatted}"
                            FontSize="32"
@@ -36,16 +36,16 @@
             
             <!-- Phases -->
             <StackPanel x:Name="PhasePanel" Visibility="Visible">
-                <TextBlock Text="Phases" FontSize="15" Foreground="#a1a1aa"/>
+                <TextBlock Text="Phases" FontSize="15" Foreground="#d4d4d8"/>
 
-                <StackPanel Margin="10 0">
+                <StackPanel Margin="10 0 0 0">
                     <ItemsControl ItemsSource="{Binding PhaseList}" FontSize="14">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Grid Margin="0 2">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="70" />
+                                        <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
                                     <TextBlock Text="{Binding Name}"
@@ -65,5 +65,22 @@
                 </StackPanel>
             </StackPanel>
         </StackPanel>
-    </Border>
+
+        <Ellipse
+                Width="16" Height="16"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+        >
+            <Ellipse.Style>
+                <Style TargetType="Ellipse">
+                    <Setter Property="Fill" Value="#f87171"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsUsingProcessor}" Value="True">
+                            <Setter Property="Fill" Value="#86efac"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Ellipse.Style>
+        </Ellipse>
+    </Grid>
 </Window>

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using nightreign_auto_storm_timer.ViewModels;
 
 namespace nightreign_auto_storm_timer.Models
 {
@@ -14,6 +15,8 @@ namespace nightreign_auto_storm_timer.Models
         private bool isActive;
 
         public bool IsVisibleTime => TimeInSeconds > 0;
+
+        public State? State { get; set; }
 
         public string TimeFormatted =>
             TimeInSeconds > 0 ? TimeSpan.FromSeconds(TimeInSeconds).ToString(@"mm\:ss") : "";

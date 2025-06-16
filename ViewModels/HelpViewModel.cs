@@ -16,7 +16,9 @@ namespace nightreign_auto_storm_timer.ViewModels
             HelpList.Add(new HelpItem { Command = "F3", Description = "Go to the previous phase" });
             HelpList.Add(new HelpItem { Command = "F4", Description = "Go to the next phase" });
             HelpList.Add(new HelpItem { Command = "F5", Description = "Toggle compact mode" });
-            HelpList.Add(new HelpItem { Command = "F6", Description = "Show/hide the help" });
+            HelpList.Add(new HelpItem { Command = "F6", Description = "Toggle automatic mode" });
+            HelpList.Add(new HelpItem { Command = "F7", Description = "Show/hide the help window" });
+            HelpList.Add(new HelpItem { Command = "F8", Description = "Show/hide the configuration window" });
         }
     }
 }
