@@ -8,7 +8,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
 
-    <AssemblyName>nast</AssemblyName>
+    <AssemblyName>nightreign-auto-storm-timer</AssemblyName>
     <PublishSingleFile>false</PublishSingleFile>
     <SelfContained>false</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
@@ -51,5 +51,9 @@
       <FilesToDelete Include="$(PublishDir)**\*.pdb" />
     </ItemGroup>
     <Delete Files="@(FilesToDelete)" />
+  </Target>
+
+  <Target Name="RenameExeOnly" AfterTargets="Publish">
+    <Exec Command="move /Y &quot;$(PublishDir)nightreign-auto-storm-timer.exe&quot; &quot;$(PublishDir)nast.exe&quot;" />
   </Target>
 </Project>
