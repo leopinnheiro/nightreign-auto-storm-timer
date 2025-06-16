@@ -88,8 +88,13 @@ public partial class MainWindow : Window
             vm.ToggleCompactMode();
             Dispatcher.Invoke(UpdateModeUI);
         }
-        // Toggle help view
+        // Start/ Stop processor
         else if (e.KeyCode == System.Windows.Forms.Keys.F6)
+        {
+            vm.ToggleUsingProcessor();
+        }
+        // Toggle help view
+        else if (e.KeyCode == System.Windows.Forms.Keys.F7)
         {
             if (_helpWindow == null)
             {
@@ -110,11 +115,6 @@ public partial class MainWindow : Window
             {
                 _helpWindow.Show();
             }
-        }
-        // Start/ Stop processor
-        else if (e.KeyCode == System.Windows.Forms.Keys.F7)
-        {
-            vm.ToggleUsingProcessor();
         }
         // Toggle Config view
         else if (e.KeyCode == System.Windows.Forms.Keys.F8)

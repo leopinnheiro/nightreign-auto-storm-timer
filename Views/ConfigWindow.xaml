@@ -136,7 +136,7 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0" >
-                    <TextBlock Text="FPS" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#fafafa"/>
+                    <TextBlock Text="FPS for OCR capture" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#fafafa"/>
                     <ComboBox Width="80"
                           VerticalAlignment="Center"
                           ItemsSource="{Binding FpsList}"
