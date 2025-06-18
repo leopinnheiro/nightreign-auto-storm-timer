@@ -11,16 +11,17 @@ public class ScreenOcrProcessor : IDisposable
     private TesseractEngine? tesseractEngine;
     private CancellationTokenSource? _cts;
     private int _fps;
-    private readonly List<TextStateDetector> _stateDetectors;
+    private readonly List<TextStateDetector> _stateDetectors = [];
 
-    public ScreenOcrProcessor(List<TextStateDetector> stateDetectors)
+    public ScreenOcrProcessor(List<TextStateDetector>? stateDetectors)
     {
         using var stream = AssetLoader.LoadAssetStream(Asset.AgmenaTrainedData);
         if (stream != null)
             tesseractEngine = TesseractResourceLoader.LoadEngineFromStream(stream, "agmena");
 
         _fps = AppConfig.Current.Fps;
-        _stateDetectors = stateDetectors;
+        if (stateDetectors != null)
+            _stateDetectors = stateDetectors;
 
         AppConfig.ConfigChanged += (s, e) =>
         {
@@ -42,13 +43,16 @@ public class ScreenOcrProcessor : IDisposable
             {
                 try
                 {
-                    using Bitmap fullScreenshot = CaptureScreen();
-                    Rectangle dayArea = CreateRelativeRect(fullScreenshot);
+                    using Bitmap fullScreenshot = ScreenUtil.CaptureCurrentScreen();
+                    Rectangle dayArea = AppConfig.Current.GetCaptureArea();
 
-                    using Bitmap cropped = CropImage(fullScreenshot, dayArea);
+                    using Bitmap cropped = ImageUtil.CropImage(fullScreenshot, dayArea);
                     using Bitmap processed = ImageProcessor.ProcessImage(cropped);
 
                     string text = RunTesseract(processed);
+
+                    DebugUtil.SaveOcrProcessImages(fullScreenshot, cropped, processed);
+                    DebugUtil.SaveOcrProcessText(text);
 
                     Application.Current.Dispatcher.Invoke(() =>
                     {
@@ -80,43 +84,7 @@ public class ScreenOcrProcessor : IDisposable
         Stop();
     }
 
-    private Bitmap CaptureScreen()
-    {
-        var screen = System.Windows.Forms.Screen.AllScreens
-            .FirstOrDefault(s => s.DeviceName == AppConfig.Current.SelectedMonitorDeviceName);
-
-        if (screen == null)
-            screen = System.Windows.Forms.Screen.PrimaryScreen;
-
-        var bounds = screen.Bounds;
-        Bitmap bmp = new Bitmap(bounds.Width, bounds.Height);
-        using Graphics g = Graphics.FromImage(bmp);
-        g.CopyFromScreen(bounds.Location, System.Drawing.Point.Empty, bounds.Size);
-        return bmp;
-    }
-
-    private Bitmap CropImage(Bitmap source, Rectangle area)
-    {
-        return source.Clone(area, source.PixelFormat);
-    }
-
-    private Rectangle CreateRelativeRect(Bitmap image)
-    {
-        int height = image.Height;
-        int width = image.Width;
-
-        int top = (int)(height * 0.5);
-        int bottom = (int)(height * 0.65);
-        int left = (int)(width * 0.35);
-        int right = (int)(width * 0.65);
-
-        int rectWidth = right - left;
-        int rectHeight = bottom - top;
-
-        return new Rectangle(left, top, rectWidth, rectHeight);
-    }
-
-    private string RunTesseract(Bitmap img)
+    public string RunTesseract(Bitmap img)
     {
         var imageBytes = ImageProcessor.ImageToBytes(img);
 

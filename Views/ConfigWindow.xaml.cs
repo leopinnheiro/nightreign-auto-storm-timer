@@ -1,4 +1,5 @@
 ﻿using nightreign_auto_storm_timer.ViewModels;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 
@@ -9,6 +10,11 @@ namespace nightreign_auto_storm_timer.Views
     /// </summary>
     public partial class ConfigWindow : Window
     {
+        public ConfigViewModel GetDataContext()
+        {
+            return (ConfigViewModel)DataContext;
+        }
+
         public ConfigWindow()
         {
             InitializeComponent();
@@ -18,8 +24,6 @@ namespace nightreign_auto_storm_timer.Views
                 if (e.ButtonState == MouseButtonState.Pressed)
                     DragMove();
             };
-
-            IsVisibleChanged += ConfigWindow_IsVisibleChanged;
         }
         private void SaveConfig_Click(object sender, RoutedEventArgs e)
         {
@@ -30,12 +34,20 @@ namespace nightreign_auto_storm_timer.Views
             Hide();
         }
 
-        private void ConfigWindow_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            if (IsVisible)
-            {
-                DataContext = new ConfigViewModel();
-            }
+            if (DataContext is not ConfigViewModel vm)
+                return;
+
+            Hide();
+        }
+
+        public void OnGuideWindowMoved(double x, double y, string monitorName)
+        {
+            if (DataContext is not ConfigViewModel vm)
+                return;
+
+            vm.OnGuideWindowMoved(x, y, monitorName);
         }
     }
 }

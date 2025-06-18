@@ -3,7 +3,6 @@ using nightreign_auto_storm_timer.Models;
 using nightreign_auto_storm_timer.Utils;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Windows.Forms;
 using System.Windows.Threading;
 
 namespace nightreign_auto_storm_timer.ViewModels
@@ -50,21 +49,7 @@ namespace nightreign_auto_storm_timer.ViewModels
         {
             State = State.Waiting_DayOne;
 
-            dayOnePhase = new Phase { Name = "Day 1 Storm", TimeInSeconds = 265 };
-            dayTwoPhase = new Phase { Name = "Day 2 Storm", TimeInSeconds = 265 };
-
-            PhaseList.Add(dayOnePhase);
-            PhaseList.Add(new Phase { Name = "Day 1 Storm Shrinking", TimeInSeconds = 174 });
-            PhaseList.Add(new Phase { Name = "Day 1 Storm 2", TimeInSeconds = 206 });
-            PhaseList.Add(new Phase { Name = "Day 1 Storm 2 Shrinking", TimeInSeconds = 174 });
-            PhaseList.Add(new Phase { Name = "Boss Fight", TimeInSeconds = 0, State = State.Waiting_DayTwo });
-            PhaseList.Add(dayTwoPhase);
-            PhaseList.Add(new Phase { Name = "Day 2 Storm Shrinking", TimeInSeconds = 177 });
-            PhaseList.Add(new Phase { Name = "Day 2 Storm 2", TimeInSeconds = 206 });
-            PhaseList.Add(new Phase { Name = "Day 2 Storm 2 Shrinking", TimeInSeconds = 177 });
-            PhaseList.Add(new Phase { Name = "Final Boss", TimeInSeconds = 0, State = State.Waiting_DayOne });
-
-            ActivePhase = PhaseList[0];
+            SetupPhase();
 
             CurrentRemainingTime = ActivePhase?.TimeInSeconds ?? 0;
 
@@ -77,17 +62,47 @@ namespace nightreign_auto_storm_timer.ViewModels
             List<TextStateDetector> detectors =
             [
                 new(["DIA I", "DAY I", "TAG I", "GIORNO I", "JOUR I"],
-                    DayOneDetected),
+                    DayOneDetected
+                    ),
                 new(["DIA II", "DAY II", "TAG II", "GIORNO II", "JOUR II"],
-                    DayTwoDetected)
+                    DayTwoDetected
+                    )
             ];
 
             _processor = new ScreenOcrProcessor(stateDetectors: detectors);
 
             IsUsingProcessor = true;
 
-            int monitorCount = Screen.AllScreens.Length;
-            Debug.WriteLine($"O usuário tem {monitorCount} monitor(es) conectado(s).");
+            AppConfig.ConfigChanged += (s, e) =>
+            {
+                SetupPhase();
+            };
+        }
+
+        public void SetupPhase()
+        {
+            string? previousPhaseName = ActivePhase?.Name;
+
+            PhaseList.Clear();
+
+            dayOnePhase = new Phase { Name = "Day 1 Storm", TimeInSeconds = AppConfig.Current.DayOneStormOne };
+            dayTwoPhase = new Phase { Name = "Day 2 Storm", TimeInSeconds = AppConfig.Current.DayTwoStormOne };
+
+            PhaseList.Add(dayOnePhase);
+            PhaseList.Add(new Phase { Name = "Day 1 Storm Shrinking", TimeInSeconds = AppConfig.Current.DayOneStormOneShrinking });
+            PhaseList.Add(new Phase { Name = "Day 1 Storm 2", TimeInSeconds = AppConfig.Current.DayOneStormTwo });
+            PhaseList.Add(new Phase { Name = "Day 1 Storm 2 Shrinking", TimeInSeconds = AppConfig.Current.DayOneStormTwoShrinking });
+            PhaseList.Add(new Phase { Name = "Boss Fight", TimeInSeconds = 0, State = State.Waiting_DayTwo });
+            PhaseList.Add(dayTwoPhase);
+            PhaseList.Add(new Phase { Name = "Day 2 Storm Shrinking", TimeInSeconds = AppConfig.Current.DayTwoStormOneShrinking });
+            PhaseList.Add(new Phase { Name = "Day 2 Storm 2", TimeInSeconds = AppConfig.Current.DayTwoStormTwo });
+            PhaseList.Add(new Phase { Name = "Day 2 Storm 2 Shrinking", TimeInSeconds = AppConfig.Current.DayTwoStormTwoShrinking });
+            PhaseList.Add(new Phase { Name = "Final Boss", TimeInSeconds = 0, State = State.Waiting_DayOne });
+
+            if (!string.IsNullOrEmpty(previousPhaseName))
+                ActivePhase = PhaseList.FirstOrDefault(p => p.Name == previousPhaseName) ?? PhaseList[0];
+            else
+                ActivePhase = PhaseList[0];
         }
 
         public void ResetTimer()

@@ -5,16 +5,28 @@
              xmlns:converters="clr-namespace:nightreign_auto_storm_timer.Converters"
              StartupUri="Views\MainWindow.xaml">
     <Application.Resources>
-        <converters:ActiveColorConverter x:Key="ActiveColorConverter"/>
-        <converters:BoolToFontWeightConverter x:Key="BoolToFontWeight"/>
-        <converters:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
-        <converters:RemainingTimeColorConverter x:Key="RemainingTimeColorConverter"/>
-        
-        <Style TargetType="Control">
-            <Setter Property="FontFamily" Value="Segoe UI Emoji"/>
-        </Style>
-        <Style TargetType="TextBlock">
-            <Setter Property="FontFamily" Value="Segoe UI Emoji"/>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Styles/TextBoxStyle.xaml" />
+                <ResourceDictionary Source="/Styles/ComboBoxStyle.xaml" />
+                <ResourceDictionary Source="/Styles/ButtonStyle.xaml" />
+                <ResourceDictionary Source="/Styles/CheckBoxStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Aqui ficam seus converters e estilos locais -->
+            <converters:ActiveColorConverter x:Key="ActiveColorConverter"/>
+            <converters:BoolToFontWeightConverter x:Key="BoolToFontWeight"/>
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
+            <converters:RemainingTimeColorConverter x:Key="RemainingTimeColorConverter"/>
+
+            <Style TargetType="Control">
+                <Setter Property="FontFamily" Value="Segoe UI Emoji"/>
+            </Style>
+            <Style TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="Segoe UI Emoji"/>
+            </Style>
+
+        </ResourceDictionary>
     </Application.Resources>
+
 </Application>

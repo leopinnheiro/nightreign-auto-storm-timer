@@ -18,7 +18,6 @@
         ShowInTaskbar="False"
         WindowStartupLocation="CenterScreen"
         Focusable="True"
-        MouseLeftButtonDown="Window_MouseLeftButtonDown"
 >
     <Grid Background="#01000000">
         <StackPanel Orientation="Vertical">

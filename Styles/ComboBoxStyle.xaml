@@ -1,0 +1,104 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style TargetType="ComboBox">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Padding" Value="6, 4" />
+        <Setter Property="MinHeight" Value="26" />
+        <Setter Property="Foreground" Value="#D4D4D8" />
+        <Setter Property="Background" Value="#18181B" />
+        <Setter Property="BorderBrush" Value="#27272A" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid>
+                        <Border x:Name="MainBorder"
+                                CornerRadius="6"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <Grid Margin="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ContentPresenter Grid.Column="0"
+                                                  Margin="8,0"
+                                                  VerticalAlignment="Center"
+                                                  HorizontalAlignment="Stretch"
+                                                  Content="{TemplateBinding SelectionBoxItem}"
+                                                  RecognizesAccessKey="True" />
+                                
+                                <Path Grid.Column="1"
+                                      Margin="8,0,8,0"
+                                      VerticalAlignment="Center"
+                                      Data="M 0 0 L 4 4 L 8 0 Z"
+                                      Fill="#A1A1AA"
+                                      Width="8"
+                                      Height="4" />
+                                
+                                <ToggleButton x:Name="FullToggle"
+                                              Grid.ColumnSpan="2"
+                                              Background="Transparent"
+                                              BorderThickness="0"
+                                              IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                              Focusable="False"
+                                              Cursor="Hand"
+                                              Foreground="{TemplateBinding Foreground}">
+                                    <ToggleButton.Template>
+                                        <ControlTemplate TargetType="ToggleButton">
+                                            <Border x:Name="Border"
+                                                    Background="{TemplateBinding Background}"
+                                                    BorderThickness="0"
+                                                    CornerRadius="6" >
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center" />
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Border" Property="Background" Value="Transparent"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </ToggleButton.Template>
+                                </ToggleButton>
+                            </Grid>
+                        </Border>
+
+                        <Popup Name="Popup"
+                               Placement="Bottom"
+                               IsOpen="{TemplateBinding IsDropDownOpen}"
+                               AllowsTransparency="True"
+                               Focusable="False"
+                               PopupAnimation="Fade">
+                            <Grid Name="DropDown"
+                                  SnapsToDevicePixels="True"
+                                  Background="#18181B"
+                                  MaxHeight="200"
+                                  MinWidth="{TemplateBinding ActualWidth}">
+                                <Border BorderBrush="#27272A"
+                                        BorderThickness="1"
+                                        Background="#18181B"/>
+                                <ScrollViewer>
+                                    <StackPanel IsItemsHost="True"
+                                                KeyboardNavigation.DirectionalNavigation="Contained" />
+                                </ScrollViewer>
+                            </Grid>
+                        </Popup>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger SourceName="FullToggle" Property="IsMouseOver" Value="True">
+                            <Setter TargetName="MainBorder" Property="Background" Value="#3f3f46"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

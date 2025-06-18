@@ -1,8 +1,6 @@
 ﻿using Gma.System.MouseKeyHook;
-using nightreign_auto_storm_timer.Models;
 using nightreign_auto_storm_timer.Utils;
 using nightreign_auto_storm_timer.ViewModels;
-using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
@@ -29,6 +27,11 @@ public partial class MainWindow : Window
 
         InitializeComponent();
         DataContext = new MainViewModel();
+        MouseLeftButtonDown += (s, e) =>
+        {
+            if (e.ButtonState == MouseButtonState.Pressed)
+                DragMove();
+        };
 
         Loaded += MainWindow_Loaded;
         Closed += MainWindow_Closed;
@@ -40,14 +43,6 @@ public partial class MainWindow : Window
     {
         _globalHook = Hook.GlobalEvents();
         _globalHook.KeyDown += GlobalHook_KeyDown;
-    }
-
-    private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-        if (e.ButtonState == MouseButtonState.Pressed)
-        {
-            DragMove();
-        }
     }
 
     private void GlobalHook_KeyDown(object? sender, System.Windows.Forms.KeyEventArgs e)
@@ -133,6 +128,10 @@ public partial class MainWindow : Window
             {
                 _configWindow.Show();
             }
+        }
+        else if (e.KeyCode == System.Windows.Forms.Keys.F9)
+        {
+            Task.Run(DebugUtil.SaveScreen);
         }
     }
 
