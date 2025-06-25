@@ -11,9 +11,9 @@ public class OcrMonitorService
 
     private static readonly Dictionary<GameDay, List<string>> DayKeywords = new()
     {
-        { GameDay.DayOne,   new() { "DIA I", "DAY I", "GIORNO I", "TAG I", "JOUR I" } },
-        { GameDay.DayTwo,   new() { "DIA II", "DAY II", "GIORNO II", "TAG II", "JOUR II" } },
-        { GameDay.DayThree, new() { "DIA III", "DAY III", "GIORNO III", "TAG III", "JOUR III" } }
+        { GameDay.DayOne,   new() { "DIA I", "DAY I", "GIORNO I", "TAG I", "JOUR I", "DÍA I" } },
+        { GameDay.DayTwo,   new() { "DIA II", "DAY II", "GIORNO II", "TAG II", "JOUR II", "DÍA II" } },
+        { GameDay.DayThree, new() { "DIA III", "DAY III", "GIORNO III", "TAG III", "JOUR III", "DÍA III" } }
     };
 
     public OcrMonitorService(Action<GameDay> onDayDetected)
