@@ -39,10 +39,13 @@ public static class NumericValidationBehavior
     private static void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
     {
         var textBox = sender as TextBox;
-        string fullText = textBox.Text.Insert(textBox.SelectionStart, e.Text);
+        if (textBox != null)
+        {
+            string fullText = textBox.Text.Insert(textBox.SelectionStart, e.Text);
 
-        if (!int.TryParse(fullText, out int number) || number <= 0)
-            e.Handled = true;
+            if (!int.TryParse(fullText, out int number) || number <= 0)
+                e.Handled = true;
+        }
     }
 
     private static void OnPaste(object sender, DataObjectPastingEventArgs e)
@@ -51,10 +54,14 @@ public static class NumericValidationBehavior
         {
             var pastedText = (string)e.DataObject.GetData(typeof(string));
             var textBox = sender as TextBox;
-            string fullText = textBox.Text.Insert(textBox.SelectionStart, pastedText);
 
-            if (!int.TryParse(fullText, out int number) || number <= 0)
-                e.CancelCommand();
+            if (textBox != null)
+            {
+                string fullText = textBox.Text.Insert(textBox.SelectionStart, pastedText);
+
+                if (!int.TryParse(fullText, out int number) || number <= 0)
+                    e.CancelCommand();
+            }
         }
         else
         {

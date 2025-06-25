@@ -16,11 +16,63 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\Icons\camera.png" />
+    <None Remove="Assets\Icons\chevron-left.png" />
+    <None Remove="Assets\Icons\chevron-right.png" />
+    <None Remove="Assets\Icons\close.png" />
+    <None Remove="Assets\Icons\help.png" />
+    <None Remove="Assets\Icons\maximize.png" />
+    <None Remove="Assets\Icons\minimize.png" />
+    <None Remove="Assets\Icons\next.png" />
+    <None Remove="Assets\Icons\pause.png" />
+    <None Remove="Assets\Icons\play.png" />
+    <None Remove="Assets\Icons\prev.png" />
+    <None Remove="Assets\Icons\settings.png" />
+    <None Remove="Assets\Icons\timer-reset.png" />
     <None Remove="Assets\start.wav" />
     <None Remove="Assets\stop.wav" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\Icons\chevron-right.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Icons\chevron-left.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Icons\close.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Icons\help.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Icons\maximize.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Icons\minimize.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Icons\next.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Icons\pause.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Icons\play.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Icons\prev.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Icons\settings.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Icons\timer-reset.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Icons\camera.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <EmbeddedResource Include="Assets\start.wav">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -36,6 +88,9 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageReference Include="MouseKeyHook" Version="5.7.1" />
+    <PackageReference Include="SharpDX" Version="4.2.0" />
+    <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
+    <PackageReference Include="SharpDX.DXGI" Version="4.2.0" />
     <PackageReference Include="Tesseract" Version="5.2.0" />
     <PackageReference Include="AForge" Version="2.2.5" />
     <PackageReference Include="AForge.Imaging" Version="2.2.5" />

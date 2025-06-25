@@ -16,7 +16,6 @@ namespace nightreign_auto_storm_timer.Models
 
         public bool IsVisibleTime => TimeInSeconds > 0;
 
-        public State? State { get; set; }
 
         public string TimeFormatted =>
             TimeInSeconds > 0 ? TimeSpan.FromSeconds(TimeInSeconds).ToString(@"mm\:ss") : "";

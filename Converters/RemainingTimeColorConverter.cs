@@ -12,8 +12,9 @@ namespace nightreign_auto_storm_timer.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is int seconds)
+            if (value is TimeSpan time)
             {
+                int seconds = (int)time.TotalSeconds;
                 if (seconds == 0)
                     return DefaultColor;
 

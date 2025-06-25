@@ -9,19 +9,18 @@ public static class ImageProcessor
 {
     public static Bitmap ProcessImage(Bitmap image)
     {
-        // Converter para escala de cinza
         Grayscale grayscale = new Grayscale(0.2125, 0.7154, 0.0721);
         using Bitmap gray = grayscale.Apply(image);
 
-        // Aplicar threshold
+        ContrastCorrection contrast = new ContrastCorrection(100);
+        contrast.ApplyInPlace(gray);
+
         Threshold threshold = new Threshold(200);
         threshold.ApplyInPlace(gray);
 
-        // Inverter as cores
         Invert invert = new Invert();
         invert.ApplyInPlace(gray);
 
-        // Aplicar filtro mediano
         Median median = new Median();
         Bitmap result = median.Apply(gray);
 

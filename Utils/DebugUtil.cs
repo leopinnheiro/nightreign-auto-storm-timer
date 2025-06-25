@@ -1,68 +1,53 @@
-﻿using nightreign_auto_storm_timer.Models;
-using System.Drawing;
+﻿using nightreign_auto_storm_timer.Managers;
+using nightreign_auto_storm_timer.Services;
+using System.Drawing.Imaging;
 using System.IO;
-using Path = System.IO.Path;
 
-namespace nightreign_auto_storm_timer.Utils
+namespace nightreign_auto_storm_timer.Utils;
+
+public static class DebugUtil
 {
-    public static class DebugUtil
+    private static string _debugPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DEBUG");
+
+    static DebugUtil()
     {
-        private static readonly string _DebugFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DEBUG");
+        EnsureDebugDirectoryExists();
+    }
 
-        static DebugUtil()
-        {
-            Directory.CreateDirectory(_DebugFolder);
-        }
+    private static void EnsureDebugDirectoryExists()
+    {
+        Directory.CreateDirectory(_debugPath);
+    }
 
-        public static void SaveOcrProcessImages(Bitmap screenshot, Bitmap cropped, Bitmap processed)
-        {
-            if (!AppConfig.Current.Debug)
-                return;
+    public static void DebugScreen()
+    {
+        var screenArea = AppConfigManager.Instance.GetScreenArea();
+        var area = AppConfigManager.Instance.GetCaptureArea();
 
-            screenshot.Save(Path.Combine(_DebugFolder, "ocr_screenshot.png"));
-            cropped.Save(Path.Combine(_DebugFolder, "ocr_cropped.png"));
-            processed.Save(Path.Combine(_DebugFolder, "ocr_processed.png"));
-        }
+        OcrUtil.Initialize();
+        using var screenshot = OcrUtil.Capture(screenArea);
+        using var cropped = OcrUtil.Capture(area);
+        using var processed = OcrUtil.ProcessImage(cropped);
+        string recognizedText = OcrUtil.Recognize(processed);
 
-        public static void SaveOcrProcessText(string text = "")
-        {
-            if (!AppConfig.Current.Debug)
-                return;
+        string filePrefix = DateTime.Now.ToString("yyyy-MM-dd__HH-mm-ss_");
 
-            File.WriteAllText(Path.Combine(_DebugFolder, "ocr_text.txt"), text);
-        }
+        string debugScreenshotPath = Path.Combine(_debugPath, $"{filePrefix}screenshot.png");
+        string debugCroppedPath = Path.Combine(_debugPath, $"{filePrefix}cropped.png");
+        string debugProcessedPath = Path.Combine(_debugPath, $"{filePrefix}processed.png");
+        string debugRecognizePath = Path.Combine(_debugPath, $"{filePrefix}recognize.txt");
 
-        public static void SaveScreen()
-        {
-            if (!AppConfig.Current.Debug)
-                return;
+        screenshot.Save(debugScreenshotPath, ImageFormat.Png);
+        cropped.Save(debugCroppedPath, ImageFormat.Png);
+        processed.Save(debugProcessedPath, ImageFormat.Png);
+        File.WriteAllText(debugRecognizePath, recognizedText);
 
-            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
-
-            using Bitmap screenshot = ScreenUtil.CaptureCurrentScreen();
-            Rectangle area = AppConfig.Current.GetCaptureArea();
-
-            using Bitmap cropped = ImageUtil.CropImage(screenshot, area);
-            using Bitmap processed = ImageProcessor.ProcessImage(cropped);
-
-            screenshot.Save(Path.Combine(_DebugFolder, $"DEBUG_screenshot_{timestamp}.png"));
-            cropped.Save(Path.Combine(_DebugFolder, $"DEBUG_cropped_{timestamp}.png"));
-            processed.Save(Path.Combine(_DebugFolder, $"DEBUG_processed_{timestamp}.png"));
-
-            var processor = new ScreenOcrProcessor(null);
-            
-            string text = processor.RunTesseract(processed);
-            File.WriteAllText(Path.Combine(_DebugFolder, $"DEBUG_text_{timestamp}.txt"), text);
-
-            using (Graphics g = Graphics.FromImage(screenshot))
-            {
-                using (Pen redPen = new Pen(Color.Purple, 3))
-                {
-                    Rectangle rect = AppConfig.Current.GetCaptureArea();
-                    g.DrawRectangle(redPen, rect);
-                }
-            }
-            screenshot.Save(Path.Combine(_DebugFolder, $"DEBUG_screenshot_area_{timestamp}.png"));
-        }
+        LogService.LogDebugArtifacts(
+            debugScreenshotPath,
+            debugCroppedPath,
+            debugProcessedPath,
+            debugRecognizePath,
+            recognizedText
+        );
     }
 }

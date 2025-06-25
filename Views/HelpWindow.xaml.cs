@@ -1,5 +1,4 @@
-﻿using nightreign_auto_storm_timer.ViewModels;
-using System.Windows;
+﻿using nightreign_auto_storm_timer.Controls;
 using System.Windows.Input;
 
 namespace nightreign_auto_storm_timer.Views
@@ -7,12 +6,11 @@ namespace nightreign_auto_storm_timer.Views
     /// <summary>
     /// Interaction logic for HelpWindow.xaml
     /// </summary>
-    public partial class HelpWindow : Window
+    public partial class HelpWindow : WindowBase
     {
         public HelpWindow()
         {
             InitializeComponent();
-            DataContext = new HelpViewModel();
             MouseLeftButtonDown += (s, e) =>
             {
                 if (e.ButtonState == MouseButtonState.Pressed)

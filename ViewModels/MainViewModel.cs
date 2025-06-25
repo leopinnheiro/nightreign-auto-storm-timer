@@ -1,273 +1,189 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using nightreign_auto_storm_timer.Enums;
+using nightreign_auto_storm_timer.Managers;
 using nightreign_auto_storm_timer.Models;
 using nightreign_auto_storm_timer.Utils;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Windows.Threading;
 
-namespace nightreign_auto_storm_timer.ViewModels
+namespace nightreign_auto_storm_timer.ViewModels;
+public partial class MainViewModel : ObservableObject
 {
-    public enum State
+    private readonly GamePhaseManager _manager;
+
+    [ObservableProperty]
+    private string currentPhaseLabel = EnumHelper.GetDescription(GamePhase.Waiting);
+
+    [ObservableProperty]
+    private TimeSpan? timeRemaining;
+
+    public string TimeRemainingFormatted =>
+        TimeRemaining?.ToString(@"mm\:ss") ?? "--:--";
+
+    [ObservableProperty]
+    private bool isCompactMode;
+
+    [ObservableProperty]
+    private bool isMonitoring;
+
+    private bool IsTimerRunning => _manager.IsTimerRunning;
+
+    [ObservableProperty]
+    private bool isShowButtons = true;
+
+    public string TimerIconPath => IsTimerRunning
+        ? "/Assets/Icons/pause.png"
+        : "/Assets/Icons/play.png";
+
+    public string ViewModeIconPath => IsCompactMode
+        ? "/Assets/Icons/maximize.png"
+        : "/Assets/Icons/minimize.png";
+
+    public string ShowButtonsIconPath => IsShowButtons
+        ? "/Assets/Icons/chevron-left.png"
+        : "/Assets/Icons/chevron-right.png";
+
+    public ObservableCollection<PhaseItemViewModel> PhaseList { get; } = new();
+
+    public MainViewModel()
     {
-        Waiting_DayOne,
-        Timer,
-        Waiting_DayTwo
+        _manager = AppManager.Instance.GamePhaseManager;
+        _manager.OnPhaseChanged += OnPhaseChanged;
+        _manager.OnTimerTick += OnTimerTick;
+
+
+        IsCompactMode = AppConfigManager.Instance.CurrentConfig.StartupViewMode == ViewMode.Compact;
+        ToggleMonitoring();
+
+        AppConfigManager.Instance.RegisterForUpdates(OnConfigUpdated);
+        SetupPhase();
     }
 
-    public partial class MainViewModel : ObservableObject
+    private void OnConfigUpdated(AppConfigNew config)
     {
-        [ObservableProperty]
-        private bool isCompactMode = true;
+        SetupPhase();
+    }
 
-        public ObservableCollection<Phase> PhaseList { get; } = [];
+    public void SetupPhase()
+    {
+        PhaseList.Clear();
+        PhaseList.Add(new PhaseItemViewModel(GameDay.DayOne, GamePhase.StormOne));
+        PhaseList.Add(new PhaseItemViewModel(GameDay.DayOne, GamePhase.StormOneShrinking));
+        PhaseList.Add(new PhaseItemViewModel(GameDay.DayOne, GamePhase.StormTwo));
+        PhaseList.Add(new PhaseItemViewModel(GameDay.DayOne, GamePhase.StormTwoShrinking));
+        PhaseList.Add(new PhaseItemViewModel(GameDay.DayOne, GamePhase.BossFight));
 
-        [ObservableProperty]
-        private Phase? activePhase;
-        
-        [ObservableProperty]
-        private int currentRemainingTime;
+        PhaseList.Add(new PhaseItemViewModel(GameDay.DayTwo, GamePhase.StormOne));
+        PhaseList.Add(new PhaseItemViewModel(GameDay.DayTwo, GamePhase.StormOneShrinking));
+        PhaseList.Add(new PhaseItemViewModel(GameDay.DayTwo, GamePhase.StormTwo));
+        PhaseList.Add(new PhaseItemViewModel(GameDay.DayTwo, GamePhase.StormTwoShrinking));
+        PhaseList.Add(new PhaseItemViewModel(GameDay.DayTwo, GamePhase.BossFight));
 
-        private DispatcherTimer? _timer;
+        PhaseList.Add(new PhaseItemViewModel(GameDay.DayThree, GamePhase.BossFight));
+    }
 
-        public string ActivePhaseName => ActivePhase?.Name ?? "";
+    private void OnPhaseChanged(GameDay day, GamePhase phase)
+    {
+        CurrentPhaseLabel = $"{EnumHelper.FormatDay(day)} - {EnumHelper.FormatPhase(phase)}";
 
-        public string CurrentRemainingTimeFormatted =>
-            TimeSpan.FromSeconds(CurrentRemainingTime).ToString(@"mm\:ss");
-
-        private Phase dayOnePhase;
-        private Phase dayTwoPhase;
-
-        [ObservableProperty]
-        private State state = State.Waiting_DayOne;
-
-        [ObservableProperty]
-        private bool isUsingProcessor;
-
-        private ScreenOcrProcessor _processor;
-
-        public MainViewModel()
+        if (PhaseList.Any(x => x.Day == day && x.Phase == phase))
         {
-            State = State.Waiting_DayOne;
-
-            SetupPhase();
-
-            CurrentRemainingTime = ActivePhase?.TimeInSeconds ?? 0;
-
-            _timer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromSeconds(1)
-            };
-            _timer.Tick += Timer_Tick;
-
-            List<TextStateDetector> detectors =
-            [
-                new(["DIA I", "DAY I", "TAG I", "GIORNO I", "JOUR I"],
-                    DayOneDetected
-                    ),
-                new(["DIA II", "DAY II", "TAG II", "GIORNO II", "JOUR II"],
-                    DayTwoDetected
-                    )
-            ];
-
-            _processor = new ScreenOcrProcessor(stateDetectors: detectors);
-
-            IsUsingProcessor = true;
-
-            AppConfig.ConfigChanged += (s, e) =>
-            {
-                SetupPhase();
-            };
+            foreach (var item in PhaseList)
+                item.IsActive = item.Day == day && item.Phase == phase;
         }
+    }
 
-        public void SetupPhase()
+    private void OnTimerTick(int secondsRemaining)
+    {
+        TimeRemaining = TimeSpan.FromSeconds(secondsRemaining);
+        OnPropertyChanged(nameof(TimeRemainingFormatted));
+        OnPropertyChanged(nameof(IsTimerRunning));
+        OnPropertyChanged(nameof(TimerIconPath));
+    }
+
+    [RelayCommand]
+    public void ToggleMonitoring()
+    {
+        if (IsMonitoring)
         {
-            string? previousPhaseName = ActivePhase?.Name;
-
-            PhaseList.Clear();
-
-            dayOnePhase = new Phase { Name = "Day 1 Storm", TimeInSeconds = AppConfig.Current.DayOneStormOne };
-            dayTwoPhase = new Phase { Name = "Day 2 Storm", TimeInSeconds = AppConfig.Current.DayTwoStormOne };
-
-            PhaseList.Add(dayOnePhase);
-            PhaseList.Add(new Phase { Name = "Day 1 Storm Shrinking", TimeInSeconds = AppConfig.Current.DayOneStormOneShrinking });
-            PhaseList.Add(new Phase { Name = "Day 1 Storm 2", TimeInSeconds = AppConfig.Current.DayOneStormTwo });
-            PhaseList.Add(new Phase { Name = "Day 1 Storm 2 Shrinking", TimeInSeconds = AppConfig.Current.DayOneStormTwoShrinking });
-            PhaseList.Add(new Phase { Name = "Boss Fight", TimeInSeconds = 0, State = State.Waiting_DayTwo });
-            PhaseList.Add(dayTwoPhase);
-            PhaseList.Add(new Phase { Name = "Day 2 Storm Shrinking", TimeInSeconds = AppConfig.Current.DayTwoStormOneShrinking });
-            PhaseList.Add(new Phase { Name = "Day 2 Storm 2", TimeInSeconds = AppConfig.Current.DayTwoStormTwo });
-            PhaseList.Add(new Phase { Name = "Day 2 Storm 2 Shrinking", TimeInSeconds = AppConfig.Current.DayTwoStormTwoShrinking });
-            PhaseList.Add(new Phase { Name = "Final Boss", TimeInSeconds = 0, State = State.Waiting_DayOne });
-
-            if (!string.IsNullOrEmpty(previousPhaseName))
-                ActivePhase = PhaseList.FirstOrDefault(p => p.Name == previousPhaseName) ?? PhaseList[0];
-            else
-                ActivePhase = PhaseList[0];
+            _manager.Stop();
+            IsMonitoring = false;
         }
-
-        public void ResetTimer()
+        else
         {
-            CurrentRemainingTime = ActivePhase?.TimeInSeconds ?? 0;
+            _manager.Start();
+            IsMonitoring = true;
         }
+    }
 
-        partial void OnActivePhaseChanged(Phase? oldValue, Phase? newValue)
-        {
-            if (oldValue != null)
-                oldValue.IsActive = false;
+    [RelayCommand]
+    public void ToggleCompactMode()
+    {
+        IsCompactMode = !IsCompactMode;
+        OnPropertyChanged(nameof(ViewModeIconPath));
+    }
 
-            if (newValue != null)
-            {
-                newValue.IsActive = true;
-                CurrentRemainingTime = newValue.TimeInSeconds;
-                
-                if (newValue.State != null)
-                    State = (State)newValue.State;
-            }
+    [RelayCommand]
+    public void ToggleHelpWindow()
+    {
+        AppManager.Instance.ShortcutManager.ExecuteShortcut(ShortcutAction.ToggleHelpView);
+    }
 
-            OnPropertyChanged(nameof(ActivePhaseName));
-        }
+    [RelayCommand]
+    public void OpenSettingsWindow()
+    {
+        AppManager.Instance.ShortcutManager.ExecuteShortcut(ShortcutAction.OpenSettingsWindow);
+    }
 
-        partial void OnCurrentRemainingTimeChanged(int oldValue, int newValue)
-        {
-            OnPropertyChanged(nameof(CurrentRemainingTimeFormatted));
-        }
+    [RelayCommand]
+    public void CloseApp()
+    {
+        AppManager.Instance.ShortcutManager.ExecuteShortcut(ShortcutAction.CloseApp);
+    }
 
-        partial void OnStateChanged(State value)
-        {
-            Debug.WriteLine($"Current State: {value.ToString()}");
-        }
+    [RelayCommand]
+    public void PauseOrResumeTimer()
+    {
+        AppManager.Instance.ShortcutManager.ExecuteShortcut(ShortcutAction.PauseOrResumeTimer);
+        OnPropertyChanged(nameof(IsTimerRunning));
+        OnPropertyChanged(nameof(TimerIconPath));
+    }
 
-        partial void OnIsUsingProcessorChanged(bool value)
-        {
-            if (value)
-                _processor.Start();
-            else
-                _processor.Stop();
-        }
+    [RelayCommand]
+    public void ResetTimer()
+    {
+        AppManager.Instance.ShortcutManager.ExecuteShortcut(ShortcutAction.ResetTimer);
+    }
 
-        private void Timer_Tick(object? sender, EventArgs e)
-        {
-            if (CurrentRemainingTime > 0)
-            {
-                CurrentRemainingTime--;
-            }
-            else
-            {
-                _timer?.Stop();
-                MoveToNextPhase();
-            }
-        }
+    [RelayCommand]
+    public void NextPhase()
+    {
+        AppManager.Instance.ShortcutManager.ExecuteShortcut(ShortcutAction.NextPhase);
+    }
 
-        private void MoveToNextPhase()
-        {
-            if (ActivePhase == null) return;
+    [RelayCommand]
+    public void PreviousPhase()
+    {
+        AppManager.Instance.ShortcutManager.ExecuteShortcut(ShortcutAction.PreviousPhase);
+    }
 
-            int index = PhaseList.IndexOf(ActivePhase);
-            int nextIndex = (index + 1) % PhaseList.Count;
-            var nextPhase = PhaseList[nextIndex];
+    [RelayCommand]
+    public void AlternateCompactMode()
+    {
+        AppManager.Instance.ShortcutManager.ExecuteShortcut(ShortcutAction.ToggleCompactMode);
+    }
 
-            ActivePhase = nextPhase;
+    [RelayCommand]
+    public void ToggleShowButtons()
+    {
+        IsShowButtons = !IsShowButtons;
+        OnPropertyChanged(nameof(ShowButtonsIconPath));
+    }
 
-            if (nextPhase.TimeInSeconds == 0)
-            {
-                _timer?.Stop();
-            }
-            else
-            {
-                _timer?.Start();
-            }
-        }
-
-        public void ToggleTimer()
-        {
-            if (_timer == null) return;
-
-            if (_timer.IsEnabled)
-            {
-                SoundManager.PlayStop();
-                _timer.Stop();
-            }
-            else
-            {
-                SoundManager.PlayStart();
-                if (ActivePhase != null && ActivePhase.TimeInSeconds == 0)
-                {
-                    MoveToNextPhase();
-                }
-                else
-                {
-                    _timer.Start();
-                    State = State.Timer;
-                }
-            }
-        }
-
-        public void ToggleCompactMode()
-        {
-            IsCompactMode = !IsCompactMode;
-        }
-
-        public void GoToNextPhase()
-        {
-            if (ActivePhase == null || PhaseList.Count == 0) return;
-
-            int index = PhaseList.IndexOf(ActivePhase);
-            if (index < PhaseList.Count - 1)
-            {
-                ActivePhase = PhaseList[index + 1];
-            }
-        }
-
-        public void GoToPreviousPhase()
-        {
-            if (ActivePhase == null || PhaseList.Count == 0) return;
-
-            int index = PhaseList.IndexOf(ActivePhase);
-            if (index > 0)
-            {
-                ActivePhase = PhaseList[index - 1];
-            }
-        }
-
-        public void ToggleUsingProcessor()
-        {
-            IsUsingProcessor = !IsUsingProcessor;
-        }
-
-        public void SetDayOnePhase()
-        {
-            if (State == State.Waiting_DayOne)
-            {
-                ActivePhase = dayOnePhase;
-                ToggleTimer();
-            }
-        }
-
-        public void SetDayTwoPhase()
-        {
-            if (State == State.Waiting_DayTwo)
-            {
-                ActivePhase = dayTwoPhase;
-                ToggleTimer();
-            }
-        }
-
-        private void DayOneDetected(string text)
-        {
-            Debug.WriteLine("Day I Detected");
-            SetDayOnePhase();
-        }
-
-        private void DayTwoDetected(string text)
-        {
-            Debug.WriteLine("Day II Detected");
-            SetDayTwoPhase();
-        }
-
-        public void Close()
-        {
-            _processor?.Stop();
-            _processor?.Dispose();
-        }
+    [RelayCommand]
+    public void DebugScreenshot()
+    {
+        AppManager.Instance.ShortcutManager.ExecuteShortcut(ShortcutAction.DEBUG);
     }
 }

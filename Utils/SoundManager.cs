@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using nightreign_auto_storm_timer.Services;
+using System.Diagnostics;
 using System.IO;
 using System.Media;
 
@@ -15,7 +16,7 @@ namespace nightreign_auto_storm_timer.Utils
             if (stream != null)
                 return new SoundPlayer(stream);
 
-            Debug.WriteLine($"[Warning] Asset {asset} not found.");
+            LogService.Warning($"[SoundManager] Sound asset not found {asset}");
             return new SoundPlayer();
         }
 

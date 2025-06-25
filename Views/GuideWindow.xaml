@@ -5,26 +5,31 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:nightreign_auto_storm_timer.Views"
         mc:Ignorable="d"
-        Width="576"
-        Height="162"
+        Width="384"
+        Height="129"
+        MinWidth="50"
+        MinHeight="50"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
         Topmost="True"
-        ResizeMode="NoResize"
         ShowInTaskbar="False"
         >
     <Grid>
         <Rectangle Stroke="#5b21b6" StrokeThickness="4" RadiusX="0" RadiusY="0" StrokeDashArray="6, 3"/>
         <Grid>
-            <!-- Seu conteúdo, inclusive o Border interno -->
-            <Border
-            CornerRadius="4" Background="#fafafa"
-            Width="24" Height="24"
-            HorizontalAlignment="Right"
-            VerticalAlignment="Top"
-            Margin="4"
-            Cursor="SizeAll"/>
+            <Border Width="20" Height="20" CornerRadius="4" Background="#fafafa"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Margin="4"
+                Cursor="SizeAll"/>
+
+            <Border Width="20" Height="20" CornerRadius="4" Background="#40FFFFFF"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    Margin="4"
+                    Cursor="SizeNWSE"
+                    MouseDown="Resize_MouseDown"/>
         </Grid>
     </Grid>
 </Window>

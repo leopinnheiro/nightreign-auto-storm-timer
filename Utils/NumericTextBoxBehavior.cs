@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace nightreign_auto_storm_timer.Behaviors;
+namespace nightreign_auto_storm_timer.Utils;
 
 public class NumericTextBoxBehavior : Behavior<TextBox>
 {

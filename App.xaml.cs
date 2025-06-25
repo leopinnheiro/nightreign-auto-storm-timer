@@ -1,6 +1,5 @@
-﻿using nightreign_auto_storm_timer.Models;
-using System.Configuration;
-using System.Data;
+﻿using nightreign_auto_storm_timer.Managers;
+using nightreign_auto_storm_timer.Utils;
 using System.Windows;
 
 namespace nightreign_auto_storm_timer;
@@ -14,8 +13,10 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        AppConfig.Load();
+        GlobalExceptionHandler.Initialize();
 
+        AppConfigManager.Instance.Load();
+        AppManager.Instance.Start();
     }
 }
 
