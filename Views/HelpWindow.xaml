@@ -32,7 +32,7 @@
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="{Binding Command}" 
+                                    <TextBlock Text="{Binding DisplayCommand}" 
                                                FontWeight="Bold" 
                                                Foreground="#fafafa"
                                                Grid.Column="0"/>
@@ -43,7 +43,7 @@
                                                Grid.Column="1"
                                                HorizontalAlignment="Center"/>
 
-                                    <TextBlock Text="{Binding Description}" 
+                                    <TextBlock Text="{Binding DisplayName}" 
                                                Foreground="#fafafa"
                                                Grid.Column="2"/>
                                 </Grid>
