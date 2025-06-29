@@ -60,7 +60,7 @@ public partial class MainViewModel : ObservableObject
         SetupPhase();
     }
 
-    private void OnConfigUpdated(AppConfigNew config)
+    private void OnConfigUpdated(AppConfig config)
     {
         SetupPhase();
     }

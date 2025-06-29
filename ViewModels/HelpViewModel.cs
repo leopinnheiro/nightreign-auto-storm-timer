@@ -16,7 +16,7 @@ public partial class HelpViewModel : ObservableObject
         ConfigFields(AppConfigManager.Instance.CurrentConfig.Shortcuts);
     }
 
-    private void OnConfigUpdated(AppConfigNew config)
+    private void OnConfigUpdated(AppConfig config)
     {
         ConfigFields(config.Shortcuts);
     }

@@ -2,7 +2,7 @@
 
 namespace nightreign_auto_storm_timer.Models;
 
-public class AppConfigNew
+public class AppConfig
 {
     public bool Debug { get; set; } = true;
     public bool RememberWindowPosition { get; set; }
@@ -16,7 +16,7 @@ public class AppConfigNew
     public PhaseConfig PhasesDayTwo { get; set; }
     public Dictionary<string, ShortcutConfig> Shortcuts { get; set; } = [];
 
-    public AppConfigNew()
+    public AppConfig()
     {
         PhasesDayOne = new PhaseConfig
         {

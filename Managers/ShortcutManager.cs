@@ -93,7 +93,7 @@ public class ShortcutManager : IDisposable
             callback.Invoke();
     }
 
-    private void OnConfigUpdated(AppConfigNew config)
+    private void OnConfigUpdated(AppConfig config)
     {
         _shortcutToName.Clear();
 

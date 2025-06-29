@@ -7,7 +7,7 @@ namespace nightreign_auto_storm_timer.Models;
 public class CaptureConfig
 {
     public string MonitorDeviceName { get; set; }
-    public int FPS { get; set; } = 20;
+    public int FPS { get; set; } = 30;
     public int PositionX { get; set; }
     public int PositionY { get; set; }
     public int Width { get; set; }

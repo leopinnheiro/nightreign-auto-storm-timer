@@ -15,9 +15,9 @@ public class AppConfigManager
 {
     public static AppConfigManager Instance { get; } = new();
 
-    public AppConfigNew CurrentConfig { get; private set; } = new();
+    public AppConfig CurrentConfig { get; private set; } = new();
 
-    private readonly List<Action<AppConfigNew>> _onConfigChanged = [];
+    private readonly List<Action<AppConfig>> _onConfigChanged = [];
 
     private readonly string ConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.json");
 
@@ -30,13 +30,13 @@ public class AppConfigManager
             try
             {
                 var json = File.ReadAllText(ConfigPath);
-                CurrentConfig = JsonSerializer.Deserialize<AppConfigNew>(json) ?? new AppConfigNew();
+                CurrentConfig = JsonSerializer.Deserialize<AppConfig>(json) ?? new AppConfig();
                 LogService.Info("[Config] Loaded config file.");
             }
             catch (Exception ex)
             {
                 LogService.Exception(ex, "[Config] Failed to load config file.");
-                CurrentConfig = new AppConfigNew();
+                CurrentConfig = new AppConfig();
             }
         }
 
@@ -55,14 +55,14 @@ public class AppConfigManager
         LogService.Info($"[Config] save config file in: {ConfigPath}");
     }
 
-    public void Update(Action<AppConfigNew> updateAction)
+    public void Update(Action<AppConfig> updateAction)
     {
         updateAction(CurrentConfig);
         Save();
         NotifyListeners();
     }
 
-    public void RegisterForUpdates(Action<AppConfigNew> callback)
+    public void RegisterForUpdates(Action<AppConfig> callback)
     {
         _onConfigChanged.Add(callback);
     }

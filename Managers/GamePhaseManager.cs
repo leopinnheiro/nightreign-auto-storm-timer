@@ -10,7 +10,8 @@ public class GamePhaseManager
     public GamePhase CurrentPhase { get; private set; } = GamePhase.Waiting;
 
     private readonly OcrMonitorService _ocrService;
-    private readonly PhaseTimer _timer;
+    private readonly CustomTimer _timer;
+    private readonly CustomTimer _timerToWaiting;
 
     public event Action<GameDay, GamePhase>? OnPhaseChanged;
     public event Action<int>? OnTimerTick;
@@ -18,17 +19,19 @@ public class GamePhaseManager
     private int _timeLeft = 0;
     public bool IsTimerRunning { get; private set; } = false;
 
-    private AppConfigNew _config = AppConfigManager.Instance.CurrentConfig;
+    private AppConfig _config = AppConfigManager.Instance.CurrentConfig;
 
     public GamePhaseManager()
     {
         _ocrService = new OcrMonitorService(OnOcrDetected);
-        _timer = new PhaseTimer(OnTimerFinished);
+        _timer = new CustomTimer(OnTimerFinished);
         _timer.OnTick += seconds =>
         {
             _timeLeft = seconds;
             OnTimerTick?.Invoke(seconds);
         };
+
+        _timerToWaiting = new CustomTimer(OnTimerToWaitingFinished);
     }
 
     public void Start()
@@ -71,7 +74,6 @@ public class GamePhaseManager
 
             _ocrService.Start();
             OnTimerTick?.Invoke(_timeLeft);
-            
         }
         else
         {
@@ -87,6 +89,11 @@ public class GamePhaseManager
                 _ocrService.Start();
         }
         LogService.Debug($"Set new phase {CurrentPhase} - {CurrentDay} : seconds left {_timeLeft}");
+
+        if (CurrentDay == GameDay.DayThree)
+        {
+            _timerToWaiting.Start(30);
+        }
     }
 
     private void OnTimerFinished()
@@ -182,5 +189,11 @@ public class GamePhaseManager
         {
             ResumeTimer();
         }
+    }
+
+    private void OnTimerToWaitingFinished()
+    {
+        CurrentDay = GameDay.None;
+        SetPhase(GamePhase.Waiting);
     }
 }

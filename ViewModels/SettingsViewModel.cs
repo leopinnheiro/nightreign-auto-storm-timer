@@ -54,7 +54,7 @@ public partial class SettingsViewModel : ObservableObject
         RequestClose?.Invoke();
     }
 
-    private void OnConfigUpdated(AppConfigNew config)
+    private void OnConfigUpdated(AppConfig config)
     {
         ConfigFields();
     }
@@ -67,7 +67,7 @@ public partial class SettingsViewModel : ObservableObject
         CaptureConfig(config.CaptureConfig);
     }
 
-    private void AppConfig(AppConfigNew config)
+    private void AppConfig(AppConfig config)
     {
         IsDebug = config.Debug;
         RememberWindowPosition = config.RememberWindowPosition;
@@ -115,7 +115,7 @@ public partial class SettingsViewModel : ObservableObject
         });
     }
 
-    private void SaveAppConfig(AppConfigNew config)
+    private void SaveAppConfig(AppConfig config)
     {
         config.Debug = IsDebug;
         config.RememberWindowPosition = RememberWindowPosition;
@@ -148,5 +148,59 @@ public partial class SettingsViewModel : ObservableObject
 
         item.Shortcut = shortcut;
         item.IsCapturing = false;
+    }
+
+    [RelayCommand]
+    private void Apply(string? parameter)
+    {
+        if (string.IsNullOrWhiteSpace(parameter)) return;
+
+        var parts = parameter.Split(':');
+        if (parts.Length != 2) return;
+
+        string type = parts[0];
+        if (!double.TryParse(parts[1], System.Globalization.CultureInfo.InvariantCulture, out double value))
+            return;
+
+        switch (type)
+        {
+            case "add":
+                PhaseConfigDayOne.StormOne += (int)value;
+                PhaseConfigDayOne.StormOneShrinking += (int)value;
+                PhaseConfigDayOne.StormTwo += (int)value;
+                PhaseConfigDayOne.StormTwoShrinking += (int)value;
+
+                PhaseConfigDayTwo.StormOne += (int)value;
+                PhaseConfigDayTwo.StormOneShrinking += (int)value;
+                PhaseConfigDayTwo.StormTwo += (int)value;
+                PhaseConfigDayTwo.StormTwoShrinking += (int)value;
+                break;
+
+            case "mult":
+                PhaseConfigDayOne.StormOne += (int)(PhaseConfigDayOne.StormOne * value);
+                PhaseConfigDayOne.StormOneShrinking += (int)(PhaseConfigDayOne.StormOneShrinking * value);
+                PhaseConfigDayOne.StormTwo += (int)(PhaseConfigDayOne.StormTwo * value);
+                PhaseConfigDayOne.StormTwoShrinking += (int)(PhaseConfigDayOne.StormTwoShrinking * value);
+
+                PhaseConfigDayTwo.StormOne += (int)(PhaseConfigDayTwo.StormOne * value);
+                PhaseConfigDayTwo.StormOneShrinking += (int)(PhaseConfigDayTwo.StormOneShrinking * value);
+                PhaseConfigDayTwo.StormTwo += (int)(PhaseConfigDayTwo.StormTwo * value);
+                PhaseConfigDayTwo.StormTwoShrinking += (int)(PhaseConfigDayTwo.StormTwoShrinking * value);
+                break;
+        }
+        NormalizeTimer();
+    }
+
+    private void NormalizeTimer()
+    {
+        PhaseConfigDayOne.StormOne = Math.Clamp(PhaseConfigDayOne.StormOne, 0, int.MaxValue);
+        PhaseConfigDayOne.StormOneShrinking = Math.Clamp(PhaseConfigDayOne.StormOneShrinking, 0, int.MaxValue);
+        PhaseConfigDayOne.StormTwo = Math.Clamp(PhaseConfigDayOne.StormTwo, 0, int.MaxValue);
+        PhaseConfigDayOne.StormTwoShrinking = Math.Clamp(PhaseConfigDayOne.StormTwoShrinking, 0, int.MaxValue);
+
+        PhaseConfigDayTwo.StormOne = Math.Clamp(PhaseConfigDayOne.StormOne, 0, int.MaxValue);
+        PhaseConfigDayTwo.StormOneShrinking = Math.Clamp(PhaseConfigDayOne.StormOneShrinking, 0, int.MaxValue);
+        PhaseConfigDayTwo.StormTwo = Math.Clamp(PhaseConfigDayOne.StormTwo, 0, int.MaxValue);
+        PhaseConfigDayTwo.StormTwoShrinking = Math.Clamp(PhaseConfigDayOne.StormTwoShrinking, 0, int.MaxValue);
     }
 }

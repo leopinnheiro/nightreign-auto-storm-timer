@@ -3,7 +3,7 @@ using Timer = System.Timers.Timer;
 
 namespace nightreign_auto_storm_timer.Services;
 
-public class PhaseTimer
+public class CustomTimer
 {
     private readonly Timer _timer;
     private int _remainingSeconds;
@@ -11,7 +11,7 @@ public class PhaseTimer
 
     public event Action<int>? OnTick;
 
-    public PhaseTimer(Action onTimerFinished)
+    public CustomTimer(Action onTimerFinished)
     {
         _onTimerFinished = onTimerFinished;
         _timer = new Timer(1000);
