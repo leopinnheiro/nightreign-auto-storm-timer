@@ -19,7 +19,7 @@ public partial class MainViewModel : ObservableObject
     private TimeSpan? timeRemaining;
 
     public string TimeRemainingFormatted =>
-        TimeRemaining?.ToString(@"mm\:ss") ?? "--:--";
+        TimeRemaining?.ToString(@"mm\:ss") ?? "00:00";
 
     [ObservableProperty]
     private bool isCompactMode;
@@ -85,7 +85,10 @@ public partial class MainViewModel : ObservableObject
 
     private void OnPhaseChanged(GameDay day, GamePhase phase)
     {
-        CurrentPhaseLabel = $"{EnumHelper.FormatDay(day)} - {EnumHelper.FormatPhase(phase)}";
+        if (phase == GamePhase.Waiting)
+            CurrentPhaseLabel = $"{EnumHelper.FormatPhase(phase)}";
+        else 
+            CurrentPhaseLabel = $"{EnumHelper.FormatDay(day)} - {EnumHelper.FormatPhase(phase)}";
 
         if (PhaseList.Any(x => x.Day == day && x.Phase == phase))
         {
@@ -185,5 +188,11 @@ public partial class MainViewModel : ObservableObject
     public void DebugScreenshot()
     {
         AppManager.Instance.ShortcutManager.ExecuteShortcut(ShortcutAction.DEBUG);
+    }
+
+    [RelayCommand]
+    public void ResetStatus()
+    {
+        AppManager.Instance.ShortcutManager.ExecuteShortcut(ShortcutAction.ResetStatus);
     }
 }

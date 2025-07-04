@@ -10,19 +10,16 @@ public static class ImageProcessor
     public static Bitmap ProcessImage(Bitmap image)
     {
         Grayscale grayscale = new Grayscale(0.2125, 0.7154, 0.0721);
-        using Bitmap gray = grayscale.Apply(image);
-
-        ContrastCorrection contrast = new ContrastCorrection(100);
-        contrast.ApplyInPlace(gray);
+        Bitmap result = grayscale.Apply(image);
 
         Threshold threshold = new Threshold(200);
-        threshold.ApplyInPlace(gray);
+        threshold.ApplyInPlace(result);
 
         Invert invert = new Invert();
-        invert.ApplyInPlace(gray);
+        invert.ApplyInPlace(result);
 
         Median median = new Median();
-        Bitmap result = median.Apply(gray);
+        median.ApplyInPlace(result);
 
         return result;
     }

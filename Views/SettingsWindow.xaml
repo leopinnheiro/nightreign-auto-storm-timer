@@ -617,7 +617,7 @@
                 <!--Control Buttons-->
                 <Border Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="3"
                         BorderBrush="#27272a" BorderThickness="0" CornerRadius="4"
-                        Margin="0, 0, 5, 0">
+                        Margin="0, 5, 5, 0">
                     <UniformGrid Columns="2" HorizontalAlignment="Center">
                         <Button Margin="4,0"
                                 Width="150"

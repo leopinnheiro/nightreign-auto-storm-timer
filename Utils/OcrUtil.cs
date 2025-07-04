@@ -1,7 +1,6 @@
 ﻿using nightreign_auto_storm_timer.Managers;
-using System.Diagnostics;
+using nightreign_auto_storm_timer.Services;
 using System.Drawing;
-using System.Text.RegularExpressions;
 using Tesseract;
 
 namespace nightreign_auto_storm_timer.Utils;
@@ -36,6 +35,9 @@ public static class OcrUtil
     {
         using var capturer = new ScreenCapturerSharpDX();
         var image = capturer.Capture(area);
+        //Bitmap image = (Bitmap)Bitmap.FromFile("");
+        //area = ScreenUtil.SuggestCaptureArea(image);
+        //image = ImageUtil.CropImage(image, area);
         return image;
     }
 
@@ -59,7 +61,7 @@ public static class OcrUtil
             using (page)
             {
                 string text = page.GetText().Trim().ToUpper();
-                text = Regex.Replace(text, @"\s+", "");
+                LogService.Debug($"OCR Text - {text}");
                 return text;
             }
         }

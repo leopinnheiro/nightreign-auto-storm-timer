@@ -1,6 +1,8 @@
 ﻿using nightreign_auto_storm_timer.Enums;
 using nightreign_auto_storm_timer.Managers;
 using nightreign_auto_storm_timer.Utils;
+using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace nightreign_auto_storm_timer.Services;
@@ -11,9 +13,9 @@ public class OcrMonitorService
 
     private static readonly Dictionary<GameDay, List<string>> DayKeywords = new()
     {
-        { GameDay.DayOne,   new() { "DIA I", "DAY I", "GIORNO I", "TAG I", "JOUR I", "DÍA I" } },
-        { GameDay.DayTwo,   new() { "DIA II", "DAY II", "GIORNO II", "TAG II", "JOUR II", "DÍA II" } },
-        { GameDay.DayThree, new() { "DIA III", "DAY III", "GIORNO III", "TAG III", "JOUR III", "DÍA III" } }
+        { GameDay.DayOne,   new() { "DIA I", "DAY I", "GIORNO I", "TAG I", "JOUR I", "DÍA I", "DZIEŃ I" } },
+        { GameDay.DayTwo,   new() { "DIA II", "DAY II", "GIORNO II", "TAG II", "JOUR II", "DÍA II", "DZIEŃ II" } },
+        { GameDay.DayThree, new() { "DIA III", "DAY III", "GIORNO III", "TAG III", "JOUR III", "DÍA III", "DZIEŃ III" } }
     };
 
     public OcrMonitorService(Action<GameDay> onDayDetected)
@@ -74,12 +76,32 @@ public class OcrMonitorService
         {
             foreach (var keyword in kvp.Value)
             {
-                var keywordFormatted = Regex.Replace(keyword, @"\s+", "");
-                if (string.Equals(text, keywordFormatted, StringComparison.OrdinalIgnoreCase))
+                var keywordFormatted = NormalizeText(keyword);
+                var textFormatted = NormalizeText(text);
+                LogService.Debug($"[OcrMonitorService] -> [ParseDayFromText] -> keyword: {keywordFormatted} | text: {textFormatted}");
+
+                if (string.Equals(textFormatted, keywordFormatted, StringComparison.OrdinalIgnoreCase))
                     return kvp.Key;
             }
         }
         
         return null;
+    }
+
+    private string NormalizeText(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            return string.Empty;
+
+        var normalized = input.Normalize(NormalizationForm.FormD);
+        var sb = new StringBuilder();
+        foreach (var c in normalized)
+        {
+            var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                sb.Append(c);
+        }
+
+        return Regex.Replace(sb.ToString(), @"\s+", "");
     }
 }

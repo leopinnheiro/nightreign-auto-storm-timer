@@ -19,6 +19,8 @@ public enum ShortcutAction
     ToggleHelpView,
     [Description("Open settings")]
     OpenSettingsWindow,
-    [Description("Toggle DEBUG mode")]
-    DEBUG
+    [Description("Take DEBUG screenshot")]
+    DEBUG,
+    [Description("Reset status")]
+    ResetStatus
 }

@@ -27,6 +27,7 @@ public static class LogService
                 {
                     EnsureLogFileSizeLimit();
                     File.AppendAllText(_logFilePath, logEntry + Environment.NewLine);
+                    System.Diagnostics.Debug.WriteLine(logEntry);
                 }
                 catch
                 {

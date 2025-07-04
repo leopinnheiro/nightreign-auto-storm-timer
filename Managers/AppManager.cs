@@ -46,6 +46,7 @@ public class AppManager
         GuideWindow = new GuideWindow();
 
         RegisterShortcuts();
+        ShortcutManager.ExecuteShortcut(ShortcutAction.ResetStatus);
         MainWindow.Show();
     }
 
@@ -125,6 +126,12 @@ public class AppManager
         ShortcutManager.RegisterNamedShortcut(ShortcutAction.DEBUG, () =>
         {
             DebugUtil.DebugScreen();
+        });
+
+        // Reset status
+        ShortcutManager.RegisterNamedShortcut(ShortcutAction.ResetStatus, () =>
+        {
+            GamePhaseManager.ResetStatus();
         });
     }
 

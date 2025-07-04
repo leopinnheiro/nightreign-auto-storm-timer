@@ -9,14 +9,21 @@ namespace nightreign_auto_storm_timer.Utils
         {
             screen ??= Screen.PrimaryScreen!;
 
-            int screenWidth = screen.Bounds.Width;
-            int screenHeight = screen.Bounds.Height;
+            return Suggest(screen.Bounds.Width, screen.Bounds.Height);
+        }
 
-            int x = (int)(screenWidth * 0.4);
-            int y = (int)(screenHeight * 0.5);
+        public static Rectangle SuggestCaptureArea(Bitmap image)
+        {
+            return Suggest(image.Width, image.Height);
+        }
 
-            int bottom = (int)(screenHeight * 0.62);
-            int right = (int)(screenWidth * 0.6);
+        private static Rectangle Suggest(int baseWidth, int baseHeight)
+        {
+            int x = (int)(baseWidth * 0.36);
+            int y = (int)(baseHeight * 0.45);
+
+            int bottom = (int)(baseHeight * 0.65);
+            int right = (int)(baseWidth * 0.65);
 
             int width = right - x;
             int height = bottom - y;

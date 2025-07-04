@@ -21,6 +21,7 @@
     <None Remove="Assets\Icons\chevron-right.png" />
     <None Remove="Assets\Icons\close.png" />
     <None Remove="Assets\Icons\help.png" />
+    <None Remove="Assets\Icons\house.png" />
     <None Remove="Assets\Icons\maximize.png" />
     <None Remove="Assets\Icons\minimize.png" />
     <None Remove="Assets\Icons\next.png" />
@@ -31,6 +32,7 @@
     <None Remove="Assets\Icons\timer-reset.png" />
     <None Remove="Assets\start.wav" />
     <None Remove="Assets\stop.wav" />
+    <None Remove="Assets\tessdata\pol.traineddata" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,6 +46,9 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Assets\Icons\help.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Icons\house.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Assets\Icons\maximize.png">

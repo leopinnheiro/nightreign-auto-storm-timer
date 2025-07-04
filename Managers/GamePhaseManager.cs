@@ -88,7 +88,7 @@ public class GamePhaseManager
             if (CurrentPhase == GamePhase.StormTwoShrinking)
                 _ocrService.Start();
         }
-        LogService.Debug($"Set new phase {CurrentPhase} - {CurrentDay} : seconds left {_timeLeft}");
+        LogService.Debug($"[GamePhaseManager] Set new phase {CurrentPhase} - {CurrentDay} : seconds left {_timeLeft}");
 
         if (CurrentDay == GameDay.DayThree)
         {
@@ -192,6 +192,11 @@ public class GamePhaseManager
     }
 
     private void OnTimerToWaitingFinished()
+    {
+        ResetStatus();
+    }
+
+    public void ResetStatus()
     {
         CurrentDay = GameDay.None;
         SetPhase(GamePhase.Waiting);

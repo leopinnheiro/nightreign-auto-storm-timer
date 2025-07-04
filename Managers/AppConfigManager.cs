@@ -97,6 +97,7 @@ public class AppConfigManager
         SetDefault(ShortcutAction.ToggleHelpView, Key.F7, ModifierKeys.None);
         SetDefault(ShortcutAction.OpenSettingsWindow, Key.F8, ModifierKeys.None);
         SetDefault(ShortcutAction.DEBUG, Key.F9, ModifierKeys.None, false);
+        SetDefault(ShortcutAction.ResetStatus, Key.None, ModifierKeys.None, false);
 
         CurrentConfig.WindowLeft = Math.Max(CurrentConfig.WindowLeft, 0);
         CurrentConfig.WindowTop = Math.Max(CurrentConfig.WindowTop, 0);
